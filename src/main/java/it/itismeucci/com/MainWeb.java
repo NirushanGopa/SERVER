@@ -108,6 +108,14 @@ public class MainWeb implements Runnable{
 			} else {
 				// GET or HEAD method
 				if (fileRequested.endsWith("/")) {
+
+					//send HTTP Headers 301
+					out.println("HTTP/1.1 301 File Moved");
+					out.println("Server: Java HTTP    : 1.0");
+					out.println("Location: http://localhost:8080/index.html");
+					out.println(); // blank line between headers and content, very important !
+					out.flush(); // flush character output stream buffer
+
 					fileRequested += DEFAULT_FILE;
 				}
 				
@@ -118,9 +126,9 @@ public class MainWeb implements Runnable{
 				if (method.equals("GET")) { // GET method so we return content
 					byte[] fileData = readFileData(file, fileLength);
 					
-					// send HTTP Headers
+					// send HTTP Headers 200
 					out.println("HTTP/1.1 200 OK");
-					out.println("Server: Java HTTP Server from SSaurel : 1.0");
+					out.println("Server: Java HTTP    : 1.0");
 					out.println("Date: " + new Date());
 					out.println("Content-type: " + content);
 					out.println("Content-length: " + fileLength);
@@ -179,14 +187,27 @@ public class MainWeb implements Runnable{
 		return fileData;
 	}
 	
-	// return supported MIME Types
-	private String getContentType(String fileRequested) {
-		if (fileRequested.endsWith(".htm")  ||  fileRequested.endsWith(".html"))
-			return "text/html";
-		else
-			return "text/plain";
-	}
-	
+   //ritorna il tipo di contenuto supportato ma conta solo se il file è di tipo HTM o HTML
+   private String getContentType(String fileRequested) {
+	if (fileRequested.endsWith(".htm")  ||  fileRequested.endsWith(".html"))
+		return "text/html";
+
+	else if(fileRequested.endsWith(".css"))
+		return "text/css";
+
+	else if(fileRequested.endsWith(".png") ||  fileRequested.endsWith(".jpeg") ||  fileRequested.endsWith(".webp") ||  fileRequested.endsWith(".gif"))
+		return "text/image";
+
+	else if(fileRequested.endsWith(".js"))
+		return "text/javascript";
+
+	else if(fileRequested.endsWith(".xml"))
+		return "text/xml";
+
+	else
+		return "text/plain";
+}
+
 	private void fileNotFound(PrintWriter out, OutputStream dataOut, String fileRequested) throws IOException {
 		File file = new File(WEB_ROOT, FILE_NOT_FOUND);
 		int fileLength = (int) file.length();
@@ -194,7 +215,7 @@ public class MainWeb implements Runnable{
 		byte[] fileData = readFileData(file, fileLength);
 		
 		out.println("HTTP/1.1 404 File Not Found");
-		out.println("Server: Java HTTP Server from SSaurel : 1.0");
+		out.println("Server: Java HTTP    : 1.0");
 		out.println("Date: " + new Date());
 		out.println("Content-type: " + content);
 		out.println("Content-length: " + fileLength);
