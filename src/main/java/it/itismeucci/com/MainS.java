@@ -15,7 +15,7 @@ import java.net.Socket;
 import java.util.Date;
 import java.util.StringTokenizer;
 
-public class MainWeb implements Runnable{ 
+public class MainS implements Runnable{ 
 	
 	static final File WEB_ROOT = new File("./src/main/resources/");
 	static final String DEFAULT_FILE = "index.html";
@@ -31,7 +31,7 @@ public class MainWeb implements Runnable{
 	// Client Connection via Socket Class
 	private Socket connect;
 	
-	public MainWeb(Socket c) {
+	public MainS(Socket c) {
 		connect = c;
 	}
 	
@@ -42,7 +42,7 @@ public class MainWeb implements Runnable{
 			
 			// we listen until user halts server execution
 			while (true) {
-				MainWeb myServer = new MainWeb(serverConnect.accept());
+				MainS myServer = new MainS(serverConnect.accept());
 				
 				if (verbose) {
 					System.out.println("Connecton opened. (" + new Date() + ")");
@@ -121,7 +121,9 @@ public class MainWeb implements Runnable{
 				
 				File file = new File(WEB_ROOT, fileRequested);
 				int fileLength = (int) file.length();
-				String content = getContentType(fileRequested);
+				
+				Contenuto g = new Contenuto();
+				String content = g.getContent(fileRequested);
 				
 				if (method.equals("GET")) { // GET method so we return content
 					byte[] fileData = readFileData(file, fileLength);
@@ -187,26 +189,6 @@ public class MainWeb implements Runnable{
 		return fileData;
 	}
 	
-   //ritorna il tipo di contenuto supportato ma conta solo se il file è di tipo HTM o HTML
-   private String getContentType(String fileRequested) {
-	if (fileRequested.endsWith(".htm")  ||  fileRequested.endsWith(".html"))
-		return "text/html";
-
-	else if(fileRequested.endsWith(".css"))
-		return "text/css";
-
-	else if(fileRequested.endsWith(".png") ||  fileRequested.endsWith(".jpeg") ||  fileRequested.endsWith(".webp") ||  fileRequested.endsWith(".gif"))
-		return "text/image";
-
-	else if(fileRequested.endsWith(".js"))
-		return "text/javascript";
-
-	else if(fileRequested.endsWith(".xml"))
-		return "text/xml";
-
-	else
-		return "text/plain";
-}
 
 	private void fileNotFound(PrintWriter out, OutputStream dataOut, String fileRequested) throws IOException {
 		File file = new File(WEB_ROOT, FILE_NOT_FOUND);
